@@ -282,8 +282,8 @@ class ApiClient:
         """
 
         encoded_data = self._prepare_data(dps, device_id, key)
-        md5 = cipher_hash(f'data={encoded_data}||lpv={version}||{key}')
-        data = f'{version}{md5}{encoded_data}'.encode('UTF-8')
+        md5 = cipher_hash('data={encoded_data}||lpv={version}||{key}'.format(encoded_data=encoded_data, version=version, key=key))
+        data = '{version}{md5}{encoded_data}'.format(version=version, md5=md5, encoded_data=encoded_data).encode('UTF-8')
 
         message_parser = MessageParser()
         message = message_parser.encode_bytes(data, 'set')
