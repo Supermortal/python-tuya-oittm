@@ -1,6 +1,12 @@
 # python-tuya-oittm
 ## Description
+Branch - master
+
 [![Build Status](https://travis-ci.org/Supermortal/python-tuya-oittm.svg?branch=master)](https://travis-ci.org/Supermortal/python-tuya-oittm)
+
+Branch - development
+
+[![Build Status](https://travis-ci.org/Supermortal/python-tuya-oittm.svg?branch=development)](https://travis-ci.org/Supermortal/python-tuya-oittm)
 
 This library facilitates communication with Tuya/Oittm devices on your local network. Currently working with the Oittm Wifi Smart Humidifier, 3L.
 ## Reason This Exists
