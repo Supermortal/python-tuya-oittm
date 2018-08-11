@@ -27,9 +27,9 @@ class MessageParser:
         Get magic prefix bytes with added command byte based on command type
         """
         if command_type == 'get':
-            prefix = f'000055aa00000000000000{GET_COMMAND_BYTE}'
+            prefix = '000055aa00000000000000{GET_COMMAND_BYTE}'.format(GET_COMMAND_BYTE=GET_COMMAND_BYTE)
         else:
-            prefix = f'000055aa00000000000000{SET_COMMAND_BYTE}'
+            prefix = '000055aa00000000000000{SET_COMMAND_BYTE}'.form(SET_COMMAND_BYTE=SET_COMMAND_BYTE)
 
         prefix_bytes = bytes.fromhex(prefix)
         return prefix_bytes
