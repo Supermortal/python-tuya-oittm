@@ -1,6 +1,6 @@
 # python-tuya-oittm
 ## Supported Python Versions
-Python versions 3.5 are currently building correctly on Travis CI
+Python versions 3.5 and up are currently building correctly on Travis CI
 ## Description
 Branch - master
 
