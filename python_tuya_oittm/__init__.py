@@ -1,8 +1,15 @@
 """
 Main pytuya-redux module
 """
+from threading import Lock
+import logging
+import time
 from .api_client import ApiClient
 from .device_maps import oittm
+
+SLEEP_ON_FAILURE_SECONDS = 5
+LOCK = Lock()
+LOG = logging.getLogger(__name__)
 
 
 class TuyaClient:
@@ -46,6 +53,31 @@ class TuyaClient:
 
         return device_status
 
+    def get_device_metadata(self, device_id):
+        """
+        Get the metadata of a Tuya device on the local network.
+        This information includes local encryption key and
+        IP address
+        """
+        api_client = ApiClient()
+
+        for _ in range(0, self.max_retries):
+            LOCK.acquire()
+            try:
+                device_metadata = api_client.get_metadata(device_id)
+            except:
+                time.sleep(SLEEP_ON_FAILURE_SECONDS)
+                continue
+            finally:
+                LOCK.release()
+
+            if device_metadata is not None:
+                return device_metadata
+            else:
+                time.sleep(SLEEP_ON_FAILURE_SECONDS)
+
+        return None
+
     def get_device_status(self, device_id, ip_address=None):
         """
         Get the status of a Tuya device on the local network;
@@ -56,20 +88,41 @@ class TuyaClient:
 
         if ip_address is None:
             for _ in range(0, self.max_retries):
-                metadata = api_client.get_metadata(device_id=device_id)
+                LOCK.acquire()
+                try:
+                    metadata = api_client.get_metadata(device_id=device_id)
+                except:
+                    time.sleep(SLEEP_ON_FAILURE_SECONDS)
+                    continue
+                finally:
+                    LOCK.release()
+
                 if metadata is not None:
                     ip_address = metadata['ip']
                     break
+                else:
+                    time.sleep(SLEEP_ON_FAILURE_SECONDS)
 
         if ip_address is None:
             return None
 
         for _ in range(0, self.max_retries):
-            raw_device_status = api_client.get_status(ip_address, device_id)
+            LOCK.acquire()
+            try:
+                raw_device_status = api_client.get_status(
+                    ip_address, device_id)
+            except:
+                time.sleep(SLEEP_ON_FAILURE_SECONDS)
+                continue
+            finally:
+                LOCK.release()
+
             if raw_device_status is not None:
                 device_status = self._user_friendly_status_mapping(
                     raw_device_status)
                 return device_status
+            else:
+                time.sleep(SLEEP_ON_FAILURE_SECONDS)
 
         return None
 
@@ -91,20 +144,40 @@ class TuyaClient:
 
         if ip_address is None or encryption_key is None:
             for _ in range(0, self.max_retries):
-                metadata = api_client.get_metadata(device_id=device_id)
+                LOCK.acquire()
+                try:
+                    metadata = api_client.get_metadata(device_id=device_id)
+                except:
+                    time.sleep(SLEEP_ON_FAILURE_SECONDS)
+                    continue
+                finally:
+                    LOCK.release()
+
                 if metadata is not None and any(metadata) is not False:
                     if ip_address is None:
                         ip_address = metadata['ip']
                     if encryption_key is None and any(metadata) is not False:
                         encryption_key = metadata['productKey']
                     break
+                else:
+                    time.sleep(SLEEP_ON_FAILURE_SECONDS)
 
         device_updated = False
         for _ in range(0, self.max_retries):
-            device_updated = api_client.set_status(
-                dps, ip_address, device_id, encryption_key, version)
+            LOCK.acquire()
+            try:
+                device_updated = api_client.set_status(
+                    dps, ip_address, device_id, encryption_key, version)
+            except:
+                time.sleep(SLEEP_ON_FAILURE_SECONDS)
+                continue
+            finally:
+                LOCK.release()
+
             if device_updated is True:
                 break
+            else:
+                time.sleep(SLEEP_ON_FAILURE_SECONDS)
 
         return device_updated
 

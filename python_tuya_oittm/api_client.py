@@ -145,8 +145,7 @@ class TuyaGetStatusProtocolFactory:
         parsed_data = message_parser.parse(data)
         parsed_data_json_obj = json.loads(parsed_data)
         self.data = parsed_data_json_obj
-        loop = asyncio.get_event_loop()
-        loop.stop()
+        self.transport.close()
 
     def error_received(self, exc):
         """
@@ -204,9 +203,7 @@ class TuyaSetStatusProtocolFactory:
         message_parser = MessageParser()
         parsed_data = message_parser.parse(data)
         self.data = bool(parsed_data == '')
-
-        loop = asyncio.get_event_loop()
-        loop.stop()
+        self.transport.close()
 
     def error_received(self, exc):
         """
