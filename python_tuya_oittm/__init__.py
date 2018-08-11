@@ -4,8 +4,9 @@ Main pytuya-redux module
 from threading import Lock
 import logging
 import time
+from .device_maps import (create_reverse_device_map, oittm)
 from .api_client import ApiClient
-from .device_maps import oittm
+
 
 SLEEP_ON_FAILURE_SECONDS = 5
 LOCK = Lock()
@@ -19,12 +20,14 @@ class TuyaClient:
     oittm-humidifer
     """
 
-    def __init__(self, device_map=None, reverse_device_map=None, max_retries=3):
+    def __init__(self, device_map=None, max_retries=3):
         """
         Initialize class
         """
         self.device_map = device_map
-        self.rev_device_map = reverse_device_map
+        self.rev_device_map = None
+        if device_map is not None:
+            self.rev_device_map = create_reverse_device_map(self.device_map)
         self.max_retries = max_retries
 
     def discover_devices(self, max_attempts=15):
@@ -187,5 +190,4 @@ class OittmHumidifierClient(TuyaClient):
         """
         Initialize class
         """
-        TuyaClient.__init__(self, oittm.OITTM_HUMIDIFIER_MAP,
-                            oittm.OITTM_REVERSE_HUMIDIFIER_MAP, max_retries)
+        TuyaClient.__init__(self, oittm.OITTM_HUMIDIFIER_MAP, max_retries)
