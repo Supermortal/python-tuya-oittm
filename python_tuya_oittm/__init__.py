@@ -7,6 +7,8 @@ import time
 from .device_maps import (create_reverse_device_map, oittm)
 from .api_client import ApiClient
 
+name = "python-tuya-oittm"
+
 
 SLEEP_ON_FAILURE_SECONDS = 5
 LOCK = Lock()
